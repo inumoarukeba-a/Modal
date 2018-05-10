@@ -1,0 +1,159 @@
+@charset "UTF-8";
+
+
+
+/* モーダル
+=========================================================== */
+.modal {
+  $this: &;
+
+  /* オーバーレイ
+  −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+  &:before {
+    content: "";
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(#aaaaaa, .7);
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity .5s ease 0s;
+    pointer-events: none;
+  }
+  &.-show:before {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+
+  /* コンテンツラップ
+  −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+  &__item {
+    position: fixed;
+    z-index: 10001;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    -ms-scroll-chaining: none;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .5s ease 0s;
+    &.-show {
+      pointer-events: auto;
+      opacity: 1;
+    }
+    &::-webkit-scrollbar {
+      width: 3px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: rgba(0, 0, 0, .1);
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, .3);
+    }
+
+    @at-root {
+      /* アイテムラップ
+      −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+      #{$this}__wrap {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        margin: 0 auto;
+        min-height: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+
+        @at-root {
+
+          #{$this}__prev,
+          #{$this}__next {
+            transition: transform .5s ease 0s;
+            color: #FFF;
+            @include mq-pc {
+              position: absolute;
+              top: 50%;
+              margin-top: -20px;
+              width: 40px;
+              height: 40px;
+            }
+            @include mq-sp {
+              width: 50%;
+              display: flex;
+              align-items: center;
+              @include fontsize(12);
+            }
+            &:before {
+              content: "";
+              display: block;
+              color: inherit;
+              border-color: currentColor;
+              border-style: solid;
+              border-width: 1px 1px 0 0;
+              cursor: pointer;
+              @include mq-pc {
+                width: inherit;
+                height: inherit;
+              }
+              @include mq-sp {
+                width: 20px;
+                height: 20px;
+              }
+            }
+          }
+          #{$this}__prev {
+            @include mq-pc {
+              left: -80px;
+              &:hover {
+                transform: translateX(-10px);
+              }
+            }
+            @include mq-sp {
+              &:after {
+                content: "PREV";
+              }
+            }
+            &:before {
+              transform: rotate(-135deg);
+            }
+            @at-root #{$this}__item:first-of-type & {
+              color: #CCC;
+              pointer-events: none;
+            }
+          }
+          #{$this}__next {
+            @include mq-pc {
+              right: -80px;
+              &:hover {
+                transform: translateX(10px);
+              }
+            }
+            @include mq-sp {
+              flex-direction: row-reverse;
+              &:after {
+                content: "NEXT";
+              }
+            }
+            &:before {
+              transform: rotate(45deg);
+            }
+            @at-root #{$this}__item:last-of-type & {
+              color: #CCC;
+              pointer-events: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}

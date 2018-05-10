@@ -1,0 +1,34 @@
+@charset "UTF-8";
+
+
+
+/* VW
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+@function round-decimal ($number, $digits: 0) {
+  @return to-fixed($number, $digits, 'round');
+}
+
+@function to-fixed ($number, $digits: 0, $round: 'round') {
+  $n: 1;
+  @if type-of($number) != number {
+    @warn '#{ $number } is not a number.';
+    @return $number;
+  }
+  @if type-of($digits) != number {
+    @warn '#{ $digits } is not a number.';
+    @return $number;
+  } @else
+  if not unitless($digits) {
+    @warn '#{ $digits } has a unit.';
+    @return $number;
+  }
+  @for $i from 1 through $digits {
+    $n: $n * 10;
+  }
+  @return round($number * $n) / $n;
+}
+
+@function get_vw($size) {
+  $rate: 100 / 750;
+  @return $rate * $size * 1;
+}
