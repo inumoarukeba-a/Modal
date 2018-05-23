@@ -13,7 +13,7 @@ var doc   = document,
 
 /* Closest
 −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-function closest(node, selector) {
+var closest = function ( node, selector ) {
   return (node.closest || function(_selector) {
     do {
       if ((node.matches || node.msMatchesSelector).call(node, _selector)) {
@@ -38,10 +38,12 @@ doc.addEventListener('DOMContentLoaded', function() {
   −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
   var MODAL           = doc.getElementsByClassName('modal'),
       MODAL_ITEM      = doc.getElementsByClassName('modal__item'),
+      MODAL_WRAP      = doc.getElementsByClassName('modal__wrap'),
       MODAL_TRIGGER   = doc.getElementsByClassName('modal__trigger'),
       MODAL_CLOSE     = doc.getElementsByClassName('modal__close'),
       MODAL_PREV      = doc.getElementsByClassName('modal__prev'),
       MODAL_NEXT      = doc.getElementsByClassName('modal__next'),
+      modalActive     = null,
       modalTarget;
 
 
@@ -54,10 +56,16 @@ doc.addEventListener('DOMContentLoaded', function() {
     e.scrollTop = 0;
     // Add Class
     e.classList.add('-show');
+    // Set Active Element
+    setTimeout(function(){
+      modalActive = e;
+    }, 100);
   }
 
   // Close Modal
   var closeModal = function (e) {
+    // Remove Active Element
+    modalActive = null;
     // Get Target
     modalTarget = closest(e, '.modal__item');
     // Remove Class
@@ -70,9 +78,9 @@ doc.addEventListener('DOMContentLoaded', function() {
     modalTarget = closest(e, '.modal__item');
     modalTarget = [].slice.call(MODAL_ITEM).indexOf(modalTarget);
     if (e.className == 'modal__prev') {
-      modalTarget = parseInt(modalTarget - 1);
+      modalTarget = Number(modalTarget - 1);
     } else if (e.className == 'modal__next') {
-      modalTarget = parseInt(modalTarget + 1);
+      modalTarget = Number(modalTarget + 1);
     }
     // Call Function
     showModal(MODAL_ITEM[modalTarget]);
@@ -95,44 +103,53 @@ doc.addEventListener('DOMContentLoaded', function() {
   −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 
   // Show Modal
-  Array.prototype.forEach.call(MODAL_TRIGGER, function(e, index) {
+  Array.prototype.forEach.call(MODAL_TRIGGER, function(e, i) {
     e.addEventListener('click', function (e) {
       // Stop Link
       e.preventDefault();
       // Get Target
       modalTarget = this.getAttribute('href');
       modalTarget = doc.querySelector(modalTarget);
-      // Call Function
+      // Call Functions
       showOverlay();
       showModal(modalTarget);
     });
   });
 
   // Close Modal
-  Array.prototype.forEach.call(MODAL_CLOSE, function(e, index) {
+  Array.prototype.forEach.call(MODAL_CLOSE, function(e, i) {
     e.addEventListener('click', function (e) {
-      // Call Function
+      // Call Functions
       closeOverlay();
       closeModal(this);
     });
   });
+  doc.addEventListener('click', function (e) {
+    if(
+      !(modalActive == null) &&
+      (!(closest(e.target, '.modal__wrap')) || e.target.className == 'modal__wrap')
+    ) {
+      // Call Functions
+      closeOverlay();
+      closeModal(modalActive);
+    };
+  });
 
   // Move Modal
-  Array.prototype.forEach.call(MODAL_PREV, function(e, index) {
+  Array.prototype.forEach.call(MODAL_PREV, function(e, i) {
     e.addEventListener('click', function (e) {
-      // Call Function
+      // Call Functions
       closeModal(this);
       moveModal(this);
     });
   });
-  Array.prototype.forEach.call(MODAL_NEXT, function(e, index) {
+  Array.prototype.forEach.call(MODAL_NEXT, function(e, i) {
     e.addEventListener('click', function (e) {
-      // Call Function
+      // Call Functions
       closeModal(this);
       moveModal(this);
     });
   });
-
 
 
 }, false);

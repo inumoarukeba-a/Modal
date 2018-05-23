@@ -19,8 +19,8 @@
     bottom: 0;
     background: rgba(#aaaaaa, .7);
     z-index: 10000;
-    opacity: 0;
     transition: opacity .5s ease 0s;
+    opacity: 0;
     pointer-events: none;
   }
   &.-show:before {
@@ -71,27 +71,50 @@
         flex-direction: column;
         margin: 0 auto;
         min-height: 100%;
-        padding: 20px;
         box-sizing: border-box;
+        @include mq-pc {
+          padding: 20px 0;
+          width: 1040px;
+        }
+        @include mq-sp {
+          @include vw(padding-left, 30);
+          @include vw(padding-right, 30);
+          @include vw(padding-top, 45);
+          @include vw(padding-bottom, 45);
+        }
 
         @at-root {
 
+          /* PREV / NEXT ボタン
+          −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+          #{$this}__utility {
+            @include mq-sp {
+              display: flex;
+            }
+          }
           #{$this}__prev,
           #{$this}__next {
             transition: transform .5s ease 0s;
             color: #FFF;
+            cursor: pointer;
             @include mq-pc {
               position: absolute;
               top: 50%;
-              margin-top: -20px;
-              width: 40px;
-              height: 40px;
+              margin-top: -50px;
+              width: 60px;
+              height: 100px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
             }
             @include mq-sp {
               width: 50%;
               display: flex;
               align-items: center;
-              @include fontsize(12);
+              justify-content: center;
+              box-sizing: border-box;
+              @include vw(padding, 15);
+              background: #000;
             }
             &:before {
               content: "";
@@ -102,12 +125,12 @@
               border-width: 1px 1px 0 0;
               cursor: pointer;
               @include mq-pc {
-                width: inherit;
-                height: inherit;
+                width: 40px;
+                height: 40px;
               }
               @include mq-sp {
-                width: 20px;
-                height: 20px;
+                width: 7px;
+                height: 7px;
               }
             }
           }
@@ -118,17 +141,29 @@
                 transform: translateX(-10px);
               }
             }
-            @include mq-sp {
-              &:after {
-                content: "PREV";
-              }
-            }
             &:before {
-              transform: rotate(-135deg);
+              transform: rotate(-135deg) translateX(-25%) translateY(25%);
+            }
+            &:after {
+              @include mq-sp {
+                content: "PREV";
+                @include vw(font-size, 24);
+                margin-left: 5px;
+              }
             }
             @at-root #{$this}__item:first-of-type & {
               color: #CCC;
               pointer-events: none;
+              @include mq-sp {
+                background: #CCC;
+                color: #FFF;
+                cursor: none;
+              }
+            }
+            @at-root #{$this}__item:not(:first-of-type) & + * {
+              @include mq-sp {
+                border-left: 1px solid rgba(#CCC, .5);
+              }
             }
           }
           #{$this}__next {
@@ -140,16 +175,25 @@
             }
             @include mq-sp {
               flex-direction: row-reverse;
-              &:after {
-                content: "NEXT";
-              }
             }
             &:before {
-              transform: rotate(45deg);
+              transform: rotate(45deg) translateX(-25%) translateY(25%);
+            }
+            &:after {
+              @include mq-sp {
+                content: "NEXT";
+                @include vw(font-size, 24);
+                margin-right: 5px;
+              }
             }
             @at-root #{$this}__item:last-of-type & {
               color: #CCC;
               pointer-events: none;
+              @include mq-sp {
+                background: #CCC;
+                color: #FFF;
+                cursor: none;
+              }
             }
           }
         }
