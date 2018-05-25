@@ -38,6 +38,7 @@ doc.addEventListener('DOMContentLoaded', function() {
   −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
   var MODAL           = doc.getElementsByClassName('modal'),
       MODAL_ITEM      = doc.getElementsByClassName('modal__item'),
+      MODAL_ITEM_NUM  = MODAL_ITEM.length,
       MODAL_WRAP      = doc.getElementsByClassName('modal__wrap'),
       MODAL_TRIGGER   = doc.getElementsByClassName('modal__trigger'),
       MODAL_CLOSE     = doc.getElementsByClassName('modal__close'),
@@ -64,25 +65,24 @@ doc.addEventListener('DOMContentLoaded', function() {
 
   // Close Modal
   var closeModal = function (e) {
-    // Remove Active Element
-    modalActive = null;
-    // Get Target
-    modalTarget = closest(e, '.modal__item');
     // Remove Class
-    modalTarget.classList.remove('-show');
+    modalActive.classList.remove('-show');
   }
 
   // Move Modal
-  var moveModal = function (e) {
+  var moveModal = function (direction) {
     // Get Target
-    modalTarget = closest(e, '.modal__item');
-    modalTarget = [].slice.call(MODAL_ITEM).indexOf(modalTarget);
-    if (e.className == 'modal__prev') {
-      modalTarget = Number(modalTarget - 1);
-    } else if (e.className == 'modal__next') {
-      modalTarget = Number(modalTarget + 1);
+    modalTarget = [].slice.call(MODAL_ITEM).indexOf(modalActive);
+    modalTarget = Number(modalTarget);
+    if (direction == 'prev' && modalTarget > 0) {
+      modalTarget = modalTarget - 1;
+    } else if (direction == 'next' && modalTarget < MODAL_ITEM_NUM - 1) {
+      modalTarget = modalTarget + 1;
+    } else {
+      return false;
     }
     // Call Function
+    closeModal();
     showModal(MODAL_ITEM[modalTarget]);
   }
 
@@ -94,6 +94,8 @@ doc.addEventListener('DOMContentLoaded', function() {
 
   // Close Overlay
   var closeOverlay = function (e) {
+    // Remove Active Element
+    modalActive = null;
     // Add Class
     MODAL[0].classList.remove('-show');
   }
@@ -120,8 +122,8 @@ doc.addEventListener('DOMContentLoaded', function() {
   Array.prototype.forEach.call(MODAL_CLOSE, function(e, i) {
     e.addEventListener('click', function (e) {
       // Call Functions
+      closeModal();
       closeOverlay();
-      closeModal(this);
     });
   });
   doc.addEventListener('click', function (e) {
@@ -130,8 +132,8 @@ doc.addEventListener('DOMContentLoaded', function() {
       (!(closest(e.target, '.modal__wrap')) || e.target.className == 'modal__wrap')
     ) {
       // Call Functions
+      closeModal();
       closeOverlay();
-      closeModal(modalActive);
     };
   });
 
@@ -139,16 +141,34 @@ doc.addEventListener('DOMContentLoaded', function() {
   Array.prototype.forEach.call(MODAL_PREV, function(e, i) {
     e.addEventListener('click', function (e) {
       // Call Functions
-      closeModal(this);
-      moveModal(this);
+      moveModal('prev');
     });
   });
   Array.prototype.forEach.call(MODAL_NEXT, function(e, i) {
     e.addEventListener('click', function (e) {
       // Call Functions
-      closeModal(this);
-      moveModal(this);
+      moveModal('next');
     });
+  });
+
+  // Keydown
+  window.addEventListener('keydown', function(e) {
+    if(!(modalActive == null)) {
+      var keyCode = event.keyCode;
+      // Escape
+      if(keyCode == 27){
+        closeModal();
+        closeOverlay();
+      }
+      // <-
+      if (keyCode == 37) {
+        moveModal('prev');
+      }
+      // ->
+      if (keyCode == 39) {
+        moveModal('next');
+      }
+    }
   });
 
 

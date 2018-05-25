@@ -17,7 +17,7 @@
     top: 0;
     right: 0;
     bottom: 0;
-    background: rgba(#aaaaaa, .7);
+    background: rgba(#333, .7);
     z-index: 10000;
     transition: opacity .5s ease 0s;
     opacity: 0;
@@ -133,7 +133,25 @@
                 height: 7px;
               }
             }
+            &:after {
+              @include mq-sp {
+                @include vw(font-size, 24);
+              }
+            }
+            @at-root {
+              #{$this}__item:first-of-type #{$this}__prev,
+              #{$this}__item:last-of-type #{$this}__next {
+                color: #999;
+                pointer-events: none;
+                @include mq-sp {
+                  background: #CCC;
+                  color: #FFF;
+                  cursor: none;
+                }
+              }
+            }
           }
+          // PREV
           #{$this}__prev {
             @include mq-pc {
               left: -80px;
@@ -147,17 +165,7 @@
             &:after {
               @include mq-sp {
                 content: "PREV";
-                @include vw(font-size, 24);
                 margin-left: 5px;
-              }
-            }
-            @at-root #{$this}__item:first-of-type & {
-              color: #CCC;
-              pointer-events: none;
-              @include mq-sp {
-                background: #CCC;
-                color: #FFF;
-                cursor: none;
               }
             }
             @at-root #{$this}__item:not(:first-of-type) & + * {
@@ -166,6 +174,7 @@
               }
             }
           }
+          // NEXT
           #{$this}__next {
             @include mq-pc {
               right: -80px;
@@ -182,17 +191,7 @@
             &:after {
               @include mq-sp {
                 content: "NEXT";
-                @include vw(font-size, 24);
                 margin-right: 5px;
-              }
-            }
-            @at-root #{$this}__item:last-of-type & {
-              color: #CCC;
-              pointer-events: none;
-              @include mq-sp {
-                background: #CCC;
-                color: #FFF;
-                cursor: none;
               }
             }
           }
