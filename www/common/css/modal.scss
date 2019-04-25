@@ -1,0 +1,319 @@
+@charset "UTF-8";
+@import '_setting/_setting';
+
+/* モーダル
+=========================================================== */
+
+/* 変数
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+$overlay: (
+  background: #ccc,
+  opacity: 0.9,
+  duration: 0.5s,
+  delay: 0s,
+  z-index: 1000,
+);
+
+$modal_item: (
+  background: #fff,
+  duration: 0.5s,
+  delay: 0s,
+  z-index: 1001,
+);
+
+$easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+/* settings
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+
+.modal {
+  background: none;
+}
+
+/* ラップ
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+.modal {
+  // オーバーレイ
+  &:before {
+    content: '';
+    display: block;
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: map-get($overlay, 'background');
+    z-index: map-get($overlay, 'z-index');
+    transition: opacity map-get($overlay, 'duration') $easeOutQuad
+      map-get($overlay, 'delay');
+    opacity: 0;
+    pointer-events: none;
+  }
+  &.-show:before {
+    opacity: 1;
+  }
+}
+
+/* アイテム
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+.modal__item {
+  position: fixed;
+  z-index: map-get($modal_item, 'z-index');
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  -ms-scroll-chaining: none;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity map-get($modal_item, 'duration') $easeOutQuad
+    map-get($modal_item, 'delay');
+  &.-show {
+    pointer-events: auto;
+    opacity: 1;
+  }
+  // スクロールバー
+  &::-webkit-scrollbar {
+    width: 3px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* アイテムラップ
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+.modal__wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  position: relative;
+  background-color: #fff;
+  box-shadow: 0px 2px 4px 1px rgba(0, 0, 0, 0.05);
+  @include mq-pc {
+    padding: 64px;
+    margin: 104px;
+    margin-bottom: 168px;
+    border-radius: 15px;
+  }
+  @include mq-sp {
+    margin: 5vw;
+    padding: 5vw;
+    border-radius: 4vw;
+  }
+}
+
+/* 閉じる
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+.modal__close {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1a1a1a;
+  transition: background 0.3s $easeOutQuad 0s, color 0.3s $easeOutQuad 0s;
+  color: #fff;
+  @include mq-pc {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    height: 64px;
+  }
+  @include mq-sp {
+    position: fixed;
+    right: 3vw;
+    bottom: 5vw;
+    width: 8vw;
+    height: 8vw;
+    border-radius: 50%;
+    box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.1);
+    border: 2px solid #fff;
+  }
+
+  span {
+    position: relative;
+    @include mq-pc {
+      padding-left: 32px;
+    }
+    @include mq-sp {
+      text-indent: -9999px;
+    }
+    &:before,
+    &:after {
+      background-color: #fff;
+      content: '';
+      display: block;
+      height: 1px;
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: rotate(45deg);
+      transition: background-color 0.3s $easeOutQuad 0s,
+        transform 0.3s $easeOutQuad 0s;
+      @include mq-pc {
+        width: 16px;
+      }
+      @include mq-sp {
+        width: 3vw;
+      }
+    }
+    &:before {
+      transform: rotate(135deg);
+    }
+  }
+
+  &:active,
+  &:hover {
+    background: lighten(#1a1a1a, 13%);
+    span {
+      &:before {
+        transform: rotate(0deg);
+      }
+      &:after {
+        transform: rotate(180deg);
+      }
+    }
+  }
+}
+
+/* コントローラー
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+.modal__controller {
+  @include mq-sp {
+    display: flex;
+  }
+}
+.modal__prev,
+.modal__next {
+  transition: transform 0.5s $easeOutQuad 0s;
+  color: #fff;
+  cursor: pointer;
+  @include mq-pc {
+    position: absolute;
+    top: 50%;
+    margin-top: -50px;
+    width: 60px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @include mq-sp {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: vw(15);
+    background: #000;
+  }
+  &:before {
+    content: '';
+    display: block;
+    color: inherit;
+    border-color: currentColor;
+    border-style: solid;
+    border-width: 1px 1px 0 0;
+    cursor: pointer;
+    @include mq-pc {
+      width: 40px;
+      height: 40px;
+    }
+    @include mq-sp {
+      width: 7px;
+      height: 7px;
+    }
+  }
+  &:after {
+    @include mq-sp {
+      font-size: vw(24);
+    }
+  }
+  @at-root {
+    .modal__item:first-of-type .modal__prev,
+    .modal__item:last-of-type .modal__next {
+      color: #999;
+      pointer-events: none;
+      @include mq-sp {
+        background: #ccc;
+        color: #fff;
+        cursor: none;
+      }
+    }
+  }
+}
+
+// PREV
+.modal__prev {
+  @include mq-pc {
+    left: -80px;
+    &:hover {
+      transform: translateX(-10px);
+    }
+  }
+  &:before {
+    transform: rotate(-135deg) translateX(-25%) translateY(25%);
+  }
+  &:after {
+    @include mq-sp {
+      content: 'PREV';
+      margin-left: 5px;
+    }
+  }
+  @at-root .modal__item:not(:first-of-type) & + * {
+    @include mq-sp {
+      border-left: 1px solid rgba(#ccc, 0.5);
+    }
+  }
+}
+
+// NEXT
+.modal__next {
+  @include mq-pc {
+    right: -80px;
+    &:hover {
+      transform: translateX(10px);
+    }
+  }
+  @include mq-sp {
+    flex-direction: row-reverse;
+  }
+  &:before {
+    transform: rotate(45deg) translateX(-25%) translateY(25%);
+  }
+  &:after {
+    @include mq-sp {
+      content: 'NEXT';
+      margin-right: 5px;
+    }
+  }
+}
+
+/* スクロール不可
+−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+html {
+  &.-fixed {
+    position: fixed;
+    width: 100%;
+    left: 0;
+    pointer-events: none;
+    overflow-y: scroll;
+    @include mq-sp {
+      overscroll-behavior: none;
+      -ms-scroll-chaining: none;
+    }
+  }
+}
