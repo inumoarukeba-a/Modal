@@ -34,7 +34,7 @@ _design/
 
 # NPM
 node_modules/
-gulpfile.babe.js
+gulpfile.babel.js
 package.json
 
 # Windows
