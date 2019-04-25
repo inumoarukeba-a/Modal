@@ -15,10 +15,10 @@
   $title = '';
 
   //css追加
-  $ex_tag_css = '';
+  $ex_tag_css = '<link rel="stylesheet" href="/common/css/modal.css">';
 
   //js追加
-  $ex_tag_js = '<script src="js/modal.js"></script>';
+  $ex_tag_js = '<script src="/common/js/modal.js" defer></script>';
 
 ?>
 <?php include 'header.php'; ?>
