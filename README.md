@@ -18,5 +18,5 @@
 
 ## 読み込むファイル
 
-modal.css
-modal.js
+- modal.css
+- modal.js
