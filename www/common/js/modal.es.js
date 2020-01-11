@@ -7,11 +7,12 @@
 −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
 const DOC = document
 const WIN = window
+const UA = navigator.userAgent
 
 /* Closest
 −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-const _CLOSEST = (el, targetClass) => {
-  for (let item = el; item; item = item.parentElement) {
+const _CLOSEST = (element, targetClass) => {
+  for (let item = element; item; item = item.parentElement) {
     if (item.classList.contains(targetClass)) {
       return item
     }
@@ -23,21 +24,20 @@ const _CLOSEST = (el, targetClass) => {
 const _MODAL = () => {
   /* constiables
   −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-  const $MODAL = DOC.querySelector('.modal')
-  const $MODAL_ITEM = DOC.querySelectorAll('.modal__item')
-  const $MODAL_TRIGGER = DOC.querySelectorAll('.modal__trigger')
-  const $MODAL_CLOSE = DOC.querySelectorAll('.modal__close')
-  const $MODAL_PREV = DOC.querySelectorAll('.modal__prev')
-  const $MODAL_NEXT = DOC.querySelectorAll('.modal__next')
   const $HTML = DOC.querySelector('html')
-  const MODAL_ITEM_LENGTH = $MODAL_ITEM.length
-  const MODAL_TRIGGER_LENGTH = $MODAL_TRIGGER.length
-  const MODAL_CLOSE_LENGTH = $MODAL_CLOSE.length
-  const MODAL_PREV_LENGTH = $MODAL_PREV.length
-  const MODAL_NEXT_LENGTH = $MODAL_NEXT.length
+  const $BODY = DOC.querySelector('body')
   let scroll_top = WIN.pageYOffset
   let modal_active = false
   let modal_target
+  let $SCROLL_TAG
+  if (UA.indexOf('OPR') !== -1 || UA.indexOf('Edge') !== -1) {
+    $SCROLL_TAG = $BODY
+  } else {
+    $SCROLL_TAG =
+      !window.chrome && 'WebkitAppearance' in document.documentElement.style
+        ? $BODY
+        : $HTML
+  }
 
   /* Functions
   −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
@@ -54,6 +54,16 @@ const _MODAL = () => {
     }, 100)
   }
 
+  // Show Overlay
+  const SHOW_OVERLAY = () => {
+    // HTML
+    scroll_top = WIN.pageYOffset
+    $HTML.style.top = -scroll_top + 'px'
+    $HTML.classList.add('-fixed')
+    // Add Class
+    DOC.querySelector('.modal').classList.add('-show')
+  }
+
   // Close Modal
   const CLOSE_MODAL = () => {
     // Remove Class
@@ -61,8 +71,22 @@ const _MODAL = () => {
     $HTML.focus()
   }
 
+  // Close Overlay
+  const CLOSE_OVERLAY = () => {
+    // Remove Active Element
+    modal_active = false
+    // HTML
+    $HTML.classList.remove('-fixed')
+    $SCROLL_TAG.scrollTop = scroll_top
+    // Remove Class
+    DOC.querySelector('.modal').classList.remove('-show')
+  }
+
   // Move Modal
   const MOVE_MODAL = direction => {
+    // Variables
+    const $MODAL_ITEM = DOC.querySelectorAll('.modal__item')
+    const MODAL_ITEM_LENGTH = $MODAL_ITEM.length
     // Get Target
     modal_target = [].slice.call($MODAL_ITEM).indexOf(modal_active)
     modal_target = Number(modal_target)
@@ -78,96 +102,60 @@ const _MODAL = () => {
     SHOW_MODAL($MODAL_ITEM[modal_target])
   }
 
-  // Show Overlay
-  const SHOW_OVERLAY = () => {
-    // HTML
-    scroll_top = WIN.pageYOffset
-    $HTML.style.top = -scroll_top + 'px'
-    $HTML.classList.add('-fixed')
-    // Add Class
-    $MODAL.classList.add('-show')
-  }
-
-  // Close Overlay
-  const CLOSE_OVERLAY = () => {
-    // Remove Active Element
-    modal_active = false
-    // HTML
-    $HTML.classList.remove('-fixed')
-    $HTML.scrollTop = scroll_top
-    // Add Class
-    $MODAL.classList.remove('-show')
-  }
-
   /* Triggers
   −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-  // Show Modal
-  for (let i = 0; i < MODAL_TRIGGER_LENGTH; i++)
-    (n => {
-      $MODAL_TRIGGER[n].addEventListener(
-        'click',
-        event => {
-          // Stop Link
-          event.preventDefault()
-          // Get Target
-          modal_target = $MODAL_TRIGGER[n].getAttribute('href')
-          modal_target = DOC.querySelector(modal_target)
-          // Call Functions
-          SHOW_OVERLAY()
-          SHOW_MODAL(modal_target)
-        },
-        false
-      )
-    })(i)
+  DOC.addEventListener(
+    'click',
+    event => {
+      const THIS_TARGET = event.target
 
-  // Close Modal
-  for (let i = 0; i < MODAL_CLOSE_LENGTH; i++)
-    (n => {
-      $MODAL_CLOSE[n].addEventListener(
-        'click',
-        event => {
+      /* Show Modal
+      −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+      if (_CLOSEST(THIS_TARGET, 'modal__trigger')) {
+        const THIS_ELEMENT = _CLOSEST(THIS_TARGET, 'modal__trigger')
+        // Stop Link
+        event.preventDefault()
+        // Get Target
+        modal_target = THIS_ELEMENT.getAttribute('href')
+        modal_target = DOC.querySelector(modal_target)
+        // Call Functions
+        SHOW_OVERLAY()
+        SHOW_MODAL(modal_target)
+      }
+
+      /* Close Modal
+      −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+      if (modal_active) {
+        if (_CLOSEST(THIS_TARGET, 'modal__close')) {
           // Call Functions
           CLOSE_MODAL()
           CLOSE_OVERLAY()
-        },
-        false
-      )
-    })(i)
-  DOC.addEventListener('click', event => {
-    if (modal_active == false) return
-    if (_CLOSEST(event.target, 'modal__wrap')) return
-    // Call Functions
-    CLOSE_MODAL()
-    CLOSE_OVERLAY()
-  })
+        }
+        if (_CLOSEST(THIS_TARGET, 'modal__wrap')) return
+        // Call Functions
+        CLOSE_MODAL()
+        CLOSE_OVERLAY()
+      }
 
-  // Move Modal
-  for (let i = 0; i < MODAL_PREV_LENGTH; i++)
-    (n => {
-      $MODAL_PREV[n].addEventListener(
-        'click',
-        event => {
-          // Call Functions
-          MOVE_MODAL('prev')
-        },
-        false
-      )
-    })(i)
-  for (let i = 0; i < MODAL_NEXT_LENGTH; i++)
-    (n => {
-      $MODAL_NEXT[n].addEventListener(
-        'click',
-        event => {
-          // Call Functions
-          MOVE_MODAL('next')
-        },
-        false
-      )
-    })(i)
+      /* Move Modal
+      −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+      if (_CLOSEST(THIS_TARGET, 'modal__prev')) {
+        // Call Functions
+        MOVE_MODAL('prev')
+      }
+      if (_CLOSEST(THIS_TARGET, 'modal__next')) {
+        // Call Functions
+        MOVE_MODAL('next')
+      }
+
+      return false
+    },
+    false
+  )
 
   // Keydown
   WIN.addEventListener('keydown', () => {
-    if (modal_active == true) {
+    if (modal_active) {
       const keyCode = event.keyCode
       // Escape
       if (keyCode == 27) {
@@ -183,6 +171,8 @@ const _MODAL = () => {
         MOVE_MODAL('next')
       }
     }
+
+    return false
   })
 }
 
