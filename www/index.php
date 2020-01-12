@@ -29,45 +29,43 @@
     <!-- Modal Trigger
     −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− -->
     <ul>
-      <li><a href="#modal01" class="modal__trigger">モーダル01</a></li>
-      <li><a href="#modal02" class="modal__trigger">モーダル02</a></li>
-      <li><a href="#modal03" class="modal__trigger">モーダル03</a></li>
+      <?php for($i = 0; $i < 3; $i++):?>
+      <li><a href="#modal<?php echo $i;?>" class="modal__trigger">モーダル<?php echo $i;?></a></li>
+      <?php endfor;?>
     </ul>
 
     <!-- Modal
     −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− -->
-    <article class="modal">
-      <section class="modal__item" id="modal01">
+    <aside class="modal">
+      <?php for($i = 0; $i < 3; $i++):?>
+      <section class="modal__item" id="modal<?php echo $i;?>">
         <div class="modal__wrap">
-          <p>コンテンツ01</p>
-          <aside class="modal__close">
-            <span>閉じる</span>
-          </aside>
-          <aside class="modal__prev"></aside>
-          <aside class="modal__next"></aside>
+          <div class="modal__inner">
+            <p>
+              Lorem ipsum dolor, sit amet consectetur adipisicing elit. Pariatur ipsa sit eveniet modi officia dicta illum facere. Adipisci dicta sed vel error itaque. Similique explicabo dolor est eos nemo animi?
+              Est error vero molestias adipisci vitae rem deleniti velit numquam quidem tenetur libero qui dolores commodi, corrupti dicta ullam labore quas, sint voluptatum culpa. Impedit cum eum consequuntur illum esse?
+              Error sed ex ducimus eaque dolorum omnis non aliquam dicta, quidem eligendi dolor asperiores amet animi perferendis possimus ea, dignissimos voluptatem natus cupiditate maxime. Aut sapiente ducimus doloremque earum officiis.
+              Exercitationem asperiores dolor quia dolore vel iste eius quod vitae nam quo? Officia totam blanditiis eius repellendus possimus facere culpa ducimus placeat eos eveniet voluptate, impedit minus sit, distinctio voluptatem.
+              Consequuntur vitae officia earum dignissimos, ducimus quae excepturi animi ipsum porro vero. Ea eligendi perferendis doloribus accusamus aliquam id necessitatibus minima ducimus nulla cum sit provident, quasi esse fugit vitae.
+            </p>
+            <p class="modal__closeButton">
+              <span class="modal__closeIcon"></span>
+              閉じる
+            </p>
+            <p class="modal__closeInterface"></p>
+          </div>
+          <aside class="modal__utility">
+              <div class="modal__prev">
+                <?php include 'svg_arrow.php'; ?>
+              </div>
+              <div class="modal__next">
+                <?php include 'svg_arrow.php'; ?>
+              </div>
+            </aside>
         </div>
       </section>
-      <section class="modal__item" id="modal02">
-        <div class="modal__wrap">
-          <p>コンテンツ02</p>
-          <aside class="modal__close">
-            <span>閉じる</span>
-          </aside>
-          <aside class="modal__prev"></aside>
-          <aside class="modal__next"></aside>
-        </div>
-      </section>
-      <section class="modal__item" id="modal03">
-        <div class="modal__wrap">
-          <p>コンテンツ03</p>
-          <aside class="modal__close">
-            <span>閉じる</span>
-          </aside>
-          <aside class="modal__prev"></aside>
-          <aside class="modal__next"></aside>
-        </div>
-      </section>
-    </article>
+      <?php endfor;?>
+    </aside>
   </main>
 
 <?php include 'footer.php'; ?>

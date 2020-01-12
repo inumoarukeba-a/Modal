@@ -1,20 +1,13 @@
 @charset "UTF-8";
 @import '_setting/_setting';
 
-/**
- * 目次
- *
- * 01. Foundation
- * 02. Plugin
- * 03. Element
- * 04. Block
- *
- */
 
-/* ==========================================================================
-   01. Foundation
-   ========================================================================== */
+/* 01. foundation
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@import '_foundation/_foundation';
 
-@import '_foundation/_reset';
-@import '_foundation/_baset';
-@import '_foundation/_responsive';
+
+/* 03. Block
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+@import '_block/_@svg';

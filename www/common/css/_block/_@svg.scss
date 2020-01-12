@@ -1,0 +1,14 @@
+@charset "UTF-8";
+
+/* Block
+───────────────────────────────── */
+[class^='svg'] {
+  transition: transform $duration $easing;
+  color: currentColor;
+}
+
+.\@svg__path {
+  transition: stroke $duration $easing, fill $duration $easing,
+    opacity $duration $easing;
+  stroke: currentColor;
+}

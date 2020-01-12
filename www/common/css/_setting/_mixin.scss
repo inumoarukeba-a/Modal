@@ -1,171 +1,222 @@
 @charset "UTF-8";
-
-
-
-// line-heightによる余白の打ち消し
-// Mixin generated at: http://text-crop.eightshapes.com/
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-@mixin text-crop($line-height: $base-line-height, $top-adjustment: 0px, $bottom-adjustment: 0px) {
-    // Configured in Step 1
-    $top-crop: 9;
-    $bottom-crop: 8;
-    $crop-font-size: 36;
-    $crop-line-height: 1.2;
-
-    // Apply values to calculate em-based margins that work with any font size
-    $dynamic-top-crop: max(($top-crop + ($line-height - $crop-line-height) * ($crop-font-size / 2)), 0) / $crop-font-size;
-    $dynamic-bottom-crop: max(($bottom-crop + ($line-height - $crop-line-height) * ($crop-font-size / 2)), 0) / $crop-font-size;
-
-    // Mixin output
-    line-height: $line-height;
-
-    &::before,
-    &::after {
-        content: '';
-        display: block;
-        height: 0;
-        width: 0;
-    }
-
-    &::before {
-        margin-bottom: calc(-#{$dynamic-top-crop}em + #{$top-adjustment});
-    }
-
-    &::after {
-        margin-top: calc(-#{$dynamic-bottom-crop}em + #{$bottom-adjustment});
-    }
-}
-
-
-
-// フォントサイズ
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-@mixin fontsize($fontsize) {
-  font-size: $fontsize + px;
-  font-size: ($fontsize / 10) + rem;
-}
-
-
-
-// コンテンツ
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-@mixin contents-width {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: $contents-width;
-  padding-left: 40px;
-  padding-right: 40px;
-  @include mq-sp {
-    margin-left: 24px;
-    margin-right: 24px;
-    max-width: initial;
-    padding-left: initial;
-    padding-right: initial;
-  }
-}
-
-
-
-// inline-block
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-@mixin inblock-parent {
-  letter-spacing: -.4em;
-}
-
-@mixin inblock {
-  display: inline-block;
-  letter-spacing: normal;
-  vertical-align: middle;
-}
-
-
-
-// VW
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-@mixin vw($property, $value) {
-  $n_px: round($value / 2);
-  $n_vw: round-decimal(get_vw($value), 1);
-  #{$property}: #{$n_px}px;
-  #{$property}: #{$n_vw}vw;
-  @include mq-pc {
-    #{$property}: #{$n_px}px;
-  }
-}
-
-
-
-// 疑似要素
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-@mixin pseudo() {
-  content: "";
-  display: block;
-}
-
-
-
-// Media Query
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
+/* Media Query
+───────────────────────────────── */
 @mixin mq-pc {
-  @media screen and (min-width: $break-small + 1) {
+  @media screen and (min-width: $break-small + 1), print {
     @content;
   }
 }
-
 @mixin mq-sp {
   @media screen and (max-width: $break-small) {
     @content;
   }
 }
-
-@mixin mq-2x {
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+@mixin mq-min {
+  @media screen and (min-width: $min-basis) {
+    @content;
+  }
+}
+@mixin mq-max {
+  @media screen and (min-width: $max-basis), print {
+    @content;
+  }
+}
+@mixin mq-full {
+  @media screen and (min-width: $break-small + 1) and (max-width: $max-basis) {
     @content;
   }
 }
 
-
-
-// media quantity
-// −−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−
-@mixin at-least($count, $selector) {
-  #{$selector}:nth-last-child(n+#{$count}),
-  #{$selector}:nth-last-child(n+#{$count}) ~ #{$selector} {
+/* Link
+───────────────────────────────── */
+@mixin hover() {
+  @include mq-pc {
+    &:hover {
+      @content;
+    }
+  }
+  @include mq-sp {
+    &:active {
+      @content;
+    }
+  }
+}
+@mixin link {
+  &,
+  &:active,
+  &:hover,
+  &:link,
+  &:visited {
     @content;
   }
 }
 
-@mixin at-most($count, $selector) {
-  #{$selector}:nth-last-child(-n+#{$count}):first-child,
-  #{$selector}:nth-last-child(-n+#{$count}):first-child ~ #{$selector} {
-    @content;
+/* Grid
+───────────────────────────────── */
+@mixin grid($options) {
+  // Gap
+  $gap-row: map-get($options, 'gap-row');
+  $gap-column: map-get($options, 'gap-column');
+  display: grid;
+  grid-row-gap: #{$gap-row};
+  grid-column-gap: #{$gap-column};
+  // Template
+  $child: map-get($options, 'child');
+  $column: map-get($options, 'column');
+  $template-columns: map-get($options, 'template-columns');
+  $template-rows: '';
+  @for $i from 1 through ceil($child / $column) {
+    $template-rows: $template-rows + auto + ' ';
+  }
+  grid-template: #{$template-rows} / #{$template-columns};
+  // Area
+  $element: map-get($options, 'element');
+  $row-area: 1;
+  $column-area: 1;
+  @for $i from 1 through $child {
+    #{$element}:nth-child(#{$i}) {
+      // -ms-grid-row: $row-area;
+      // -ms-grid-column: $column-area;
+      @if ($i % $column == 0) {
+        $row-area: $row-area + 1;
+        @if $gap-row != false {
+          $row-area: $row-area + 1;
+        }
+      }
+      @if $gap-column != false {
+        $column-area: $column-area + 1;
+        @if ($i % $column == 0) {
+          $column-area: 0;
+        }
+        $column-area: $column-area + 1;
+      }
+    }
   }
 }
 
-@mixin between($start, $end, $selector) {
-  #{$selector}:nth-last-child(n+#{$start}):nth-last-child(-n+#{$end}):first-child,
-  #{$selector}:nth-last-child(n+#{$start}):nth-last-child(-n+#{$end}):first-child ~ #{$selector} {
-    @content;
+/* Font
+───────────────────────────────── */
+@mixin font-noto($weight: demilight) {
+  font-family: noto-sans-cjk-jp, sans-serif;
+  font-style: normal;
+  @if $weight == light {
+    font-weight: 200;
+  } @else if $weight == demilight {
+    font-weight: 300;
+  } @else if $weight == regular {
+    font-weight: 400;
+  } @else if $weight == medium {
+    font-weight: 500;
+  } @else if $weight == bold {
+    font-weight: 700;
+  } @else {
+    font-weight: 300;
   }
 }
 
-@mixin exactly($count, $selector) {
-  #{$selector}:nth-last-child(#{$count}):first-child,
-  #{$selector}:nth-last-child(#{$count}):first-child ~ #{$selector} {
-    @content;
+/* Pseudo
+───────────────────────────────── */
+@mixin pseudo {
+  content: '';
+  display: inline-block;
+}
+
+/* contents
+───────────────────────────────── */
+@mixin content-width {
+  @include mq-pc {
+    max-width: rem(strip-unit($max-basis));
+    min-width: rem(strip-unit($min-basis));
+    width: 100%;
+    padding-left: rem(64);
+    padding-right: rem(64);
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
+/* PC item & SP item
+───────────────────────────────── */
+@mixin pc-item {
+  @include mq-pc {
+    display: block;
+  }
+  @include mq-sp {
+    display: none;
+  }
+}
+@mixin sp-item {
+  @include mq-pc {
+    display: none;
+  }
+  @include mq-sp {
+    display: block;
+  }
+}
 
+/* Tel
+───────────────────────────────── */
+@mixin tel-linktext {
+  @include mq-pc {
+    pointer-events: none;
+    text-decoration: none;
+  }
+}
 
-/* Arrow
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-@mixin arrow--small($value: 4px, $color: $color-blue) {
-  @include pseudo();
-  width: $value;
-  height: $value;
-  border-width: 1px 1px 0 0;
-  border-style: solid;
-  border-color: $color;
-  transform: rotate(45deg);
-  margin-right: 8px;
+/* Image
+───────────────────────────────── */
+@mixin img-full {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+@mixin ofi-contain {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  font-family: 'object-fit: contain;';
+}
+
+@mixin ofi-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  font-family: 'object-fit: cover;';
+}
+
+/* Sticky
+───────────────────────────────── */
+@mixin sticky {
+  position: -webkit-sticky;
+  position: sticky;
+
+  &.sticky-fixed.is-sticky {
+    position: fixed;
+    -webkit-backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  &.sticky-fixed.is-sticky:not([style*='margin-top']) {
+    margin-top: 0 !important;
+  }
+
+  &.sticky-fixed.is-sticky:not([style*='margin-bottom']) {
+    margin-bottom: 0 !important;
+  }
+
+  &.sticky-fixed.is-absolute {
+    position: absolute;
+  }
+}
+
+/* Clearfix
+───────────────────────────────── */
+@mixin cearfix {
+  &::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
 }

@@ -4,37 +4,29 @@
 /* モーダル
 =========================================================== */
 
-/* 変数
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+/* Variables
+───────────────────────────────── */
 $overlay: (
-  background: #ccc,
-  opacity: 0.9,
-  duration: 0.5s,
+  background: #000,
+  opacity: 0.55,
+  duration: $base-duration * 1.618,
   delay: 0s,
   z-index: 1000,
 );
 
 $modal_item: (
-  background: #fff,
-  duration: 0.5s,
+  duration: $base-duration * 1.618,
   delay: 0s,
   z-index: 1001,
 );
 
-$easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-/* settings
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-
+/* Block
+───────────────────────────────── */
 .modal {
   background: none;
-}
-
-/* ラップ
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-.modal {
-  // オーバーレイ
-  &:before {
+  // Overlay
+  &:before,
+  &:after {
     content: '';
     display: block;
     position: fixed;
@@ -42,26 +34,37 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
     top: 0;
     right: 0;
     bottom: 0;
-    background: map-get($overlay, 'background');
-    z-index: map-get($overlay, 'z-index');
-    transition: opacity map-get($overlay, 'duration') $easeOutQuad
-      map-get($overlay, 'delay');
     opacity: 0;
     pointer-events: none;
+    transition: opacity map-get($overlay, 'duration') $easing
+      map-get($overlay, 'delay');
   }
-  &.-show:before {
-    opacity: 1;
+  &:before {
+    background: rgba(
+      map-get($overlay, 'background'),
+      map-get($overlay, 'opacity')
+    );
+    z-index: map-get($overlay, 'z-index');
+  }
+  &.-opened {
+    &:before,
+    &:after {
+      left: 0;
+      top: 0;
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
 }
 
-/* アイテム
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+/* Item
+───────────────────────────────── */
 .modal__item {
   position: fixed;
   z-index: map-get($modal_item, 'z-index');
   left: 0;
-  top: 0;
   right: 0;
+  top: 0;
   bottom: 0;
   overflow-x: hidden;
   overflow-y: auto;
@@ -71,13 +74,15 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   -ms-scroll-chaining: none;
   pointer-events: none;
   opacity: 0;
-  transition: opacity map-get($modal_item, 'duration') $easeOutQuad
-    map-get($modal_item, 'delay');
-  &.-show {
+  transition: opacity map-get($modal_item, 'duration') $easing
+      map-get($modal_item, 'delay'),
+    top map-get($modal_item, 'duration') $easing map-get($modal_item, 'delay');
+  &.-opened {
     pointer-events: auto;
     opacity: 1;
   }
-  // スクロールバー
+
+  // Scrollbar
   &::-webkit-scrollbar {
     width: 3px;
   }
@@ -89,8 +94,8 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 }
 
-/* アイテムラップ
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+/* Wrap
+───────────────────────────────── */
 .modal__wrap {
   position: relative;
   display: flex;
@@ -98,87 +103,66 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   flex-direction: column;
   min-height: 100%;
   margin: 0 auto;
-  box-sizing: border-box;
-  position: relative;
-  background-color: #fff;
-  box-shadow: 0px 2px 4px 1px rgba(0, 0, 0, 0.05);
   @include mq-pc {
-    padding: 64px;
-    margin: 104px;
-    margin-bottom: 168px;
-    border-radius: 15px;
+    max-width: rem(800);
   }
   @include mq-sp {
-    margin: 5vw;
-    padding: 5vw;
-    border-radius: 4vw;
+    padding: 13vw 0 8vw 0;
   }
 }
 
-/* 閉じる
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-.modal__close {
+/* Inner
+───────────────────────────────── */
+.modal__inner {
+  box-sizing: border-box;
+  position: relative;
+  background-color: #fff;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  @include mq-pc {
+    padding: rem(64);
+  }
+  @include mq-sp {
+    padding: 8vw;
+  }
+}
+
+/* Utility
+───────────────────────────────── */
+// Close
+.modal__closeButton {
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #1a1a1a;
-  transition: background 0.3s $easeOutQuad 0s, color 0.3s $easeOutQuad 0s;
-  color: #fff;
+  transition: background $base-duration $easing 0s,
+    color $base-duration $easing 0s, border-color $base-duration $easing 0s;
+  border: 1px solid #cccccc;
+  position: relative;
+  width: 38.2%;
+  margin-left: auto;
+  margin-right: auto;
   @include mq-pc {
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    height: 64px;
+    font-size: rem(14);
+    padding: rem(8);
+    margin-top: rem(24);
   }
   @include mq-sp {
-    position: fixed;
-    right: 3vw;
-    bottom: 5vw;
-    width: 8vw;
-    height: 8vw;
-    border-radius: 50%;
-    box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.1);
-    border: 2px solid #fff;
+    font-size: vw(14);
+    padding: 2vw;
+    margin-top: 5vw;
+    width: 61.8%;
   }
-
-  span {
-    position: relative;
-    @include mq-pc {
-      padding-left: 32px;
-    }
-    @include mq-sp {
-      text-indent: -9999px;
-    }
-    &:before,
-    &:after {
-      background-color: #fff;
-      content: '';
-      display: block;
-      height: 1px;
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: rotate(45deg);
-      transition: background-color 0.3s $easeOutQuad 0s,
-        transform 0.3s $easeOutQuad 0s;
-      @include mq-pc {
-        width: 16px;
+  @include hover {
+    color: #fff;
+    background: $color-text;
+    border-color: $color-text;
+    .modal__closeIcon {
+      &:before,
+      &:after {
+        background-color: #fff;
       }
-      @include mq-sp {
-        width: 3vw;
-      }
-    }
-    &:before {
-      transform: rotate(135deg);
-    }
-  }
-
-  &:active,
-  &:hover {
-    background: lighten(#1a1a1a, 13%);
-    span {
       &:before {
         transform: rotate(0deg);
       }
@@ -187,59 +171,136 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
       }
     }
   }
-}
 
-/* コントローラー
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-.modal__controller {
-  @include mq-sp {
+  .modal__closeIcon {
+    position: absolute;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    @include mq-pc {
+      width: rem(16);
+      height: rem(16);
+      right: rem(8);
+    }
+    @include mq-sp {
+      width: 3vw;
+      height: 3vw;
+      right: 3vw;
+    }
+
+    &:before,
+    &:after {
+      background-color: $color-text;
+      content: '';
+      display: block;
+      height: 1px;
+      width: inherit;
+      position: absolute;
+      transition: background-color $base-duration $easing 0s,
+        transform $base-duration $easing 0s;
+    }
+
+    &:before {
+      transform: rotate(45deg);
+    }
+    &:after {
+      transform: rotate(135deg);
+    }
   }
 }
+
+.modal__closeInterface {
+  position: absolute;
+  cursor: pointer;
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @include mq-pc {
+    right: rem(-64);
+    top: rem(-64);
+    width: rem(40);
+    height: rem(40);
+    padding: rem(16);
+  }
+  @include mq-sp {
+    right: 3vw;
+    top: -10vw;
+    width: 5vw;
+    height: 5vw;
+    padding: 2vw;
+  }
+  &:before,
+  &:after {
+    background-color: #fff;
+    content: '';
+    display: block;
+    height: 1px;
+    width: inherit;
+    position: absolute;
+    transform: rotate(45deg);
+    transition: background-color $base-duration $easing 0s,
+      transform $base-duration $easing 0s;
+  }
+
+  &:before {
+    transform: rotate(45deg);
+  }
+  &:after {
+    transform: rotate(135deg);
+  }
+
+  @include hover {
+    &:before {
+      transform: rotate(0);
+    }
+    &:after {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// Controller
+.modal__utility {
+  @include mq-sp {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: auto;
+  }
+}
+
 .modal__prev,
 .modal__next {
-  transition: transform 0.5s $easeOutQuad 0s;
-  color: #fff;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background $base-duration $easing;
   @include mq-pc {
     position: absolute;
     top: 50%;
-    margin-top: -50px;
-    width: 60px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: rem(32);
+    transform: translateY(-50%);
   }
   @include mq-sp {
-    width: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    padding: vw(15);
-    background: #000;
+    font-size: vw(13);
+    padding: 3vw 5vw;
   }
-  &:before {
-    content: '';
-    display: block;
-    color: inherit;
-    border-color: currentColor;
-    border-style: solid;
-    border-width: 1px 1px 0 0;
-    cursor: pointer;
-    @include mq-pc {
-      width: 40px;
-      height: 40px;
-    }
+  .\@svg {
     @include mq-sp {
-      width: 7px;
-      height: 7px;
+      width: vw(8);
+      height: auto;
     }
   }
-  &:after {
+  @include hover {
     @include mq-sp {
-      font-size: vw(24);
+      background: $color-text;
+    }
+    .\@svg {
+      @include mq-pc {
+        transform: scale(1.1618);
+      }
     }
   }
   @at-root {
@@ -248,7 +309,7 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
       color: #999;
       pointer-events: none;
       @include mq-sp {
-        background: #ccc;
+        opacity: 0.382;
         color: #fff;
         cursor: none;
       }
@@ -256,37 +317,29 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 }
 
-// PREV
+// Prev
 .modal__prev {
   @include mq-pc {
-    left: -80px;
-    &:hover {
-      transform: translateX(-10px);
-    }
+    left: rem(-80);
+    transform: rotate(180deg) translateY(50%);
   }
-  &:before {
-    transform: rotate(-135deg) translateX(-25%) translateY(25%);
+  .\@svg {
+    @include mq-sp {
+      transform: rotate(180deg);
+    }
   }
   &:after {
     @include mq-sp {
       content: 'PREV';
-      margin-left: 5px;
-    }
-  }
-  @at-root .modal__item:not(:first-of-type) & + * {
-    @include mq-sp {
-      border-left: 1px solid rgba(#ccc, 0.5);
+      margin-left: 3vw;
     }
   }
 }
 
-// NEXT
+// Next
 .modal__next {
   @include mq-pc {
-    right: -80px;
-    &:hover {
-      transform: translateX(10px);
-    }
+    right: rem(-80);
   }
   @include mq-sp {
     flex-direction: row-reverse;
@@ -297,23 +350,25 @@ $easeOutQuad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
   &:after {
     @include mq-sp {
       content: 'NEXT';
-      margin-right: 5px;
+      margin-right: 3vw;
     }
   }
 }
 
-/* スクロール不可
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
+/* Scroll
+───────────────────────────────── */
 html {
-  &.-fixed {
+  &.-fixed,
+  &.-fixed body {
     position: fixed;
-    width: 100%;
+    max-height: 100vh;
     left: 0;
-    pointer-events: none;
-    overflow-y: scroll;
-    @include mq-sp {
-      overscroll-behavior: none;
-      -ms-scroll-chaining: none;
-    }
+    width: 100%;
   }
+}
+
+/* Trigger
+───────────────────────────────── */
+.modal__trigger {
+  cursor: pointer;
 }

@@ -1,34 +1,63 @@
 @charset "UTF-8";
 
-
-
-/* VW
-−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−− */
-@function round-decimal ($number, $digits: 0) {
-  @return to-fixed($number, $digits, 'round');
+/* z-index
+───────────────────────────────── */
+@function z($name, $childname: 0) {
+  $getkey: map-get($z-map, $name);
+  @if $childname != 0 {
+    @return index($getkey, $childname);
+  }
+  @return inspect(index($z-map, ($name $getkey)));
 }
 
-@function to-fixed ($number, $digits: 0, $round: 'round') {
+/* VW
+───────────────────────────────── */
+@function round-decimal($number, $digits: 0) {
   $n: 1;
-  @if type-of($number) != number {
-    @warn '#{ $number } is not a number.';
-    @return $number;
-  }
-  @if type-of($digits) != number {
-    @warn '#{ $digits } is not a number.';
-    @return $number;
-  } @else
-  if not unitless($digits) {
-    @warn '#{ $digits } has a unit.';
-    @return $number;
-  }
-  @for $i from 1 through $digits {
-    $n: $n * 10;
+  @if $digits > 0 {
+    @for $i from 1 through $digits {
+      $n: $n * 10;
+    }
   }
   @return round($number * $n) / $n;
 }
 
-@function get_vw($size) {
-  $rate: 100 / 750;
-  @return $rate * $size * 1;
+@function vw($value, $basis: strip-unit($sp-basis)) {
+  $rate: 100 / $basis;
+  @return #{round-decimal($rate * $value * 1, 2)}vw;
+}
+
+@function rem($value) {
+  @return #{$value / 100}rem;
+}
+
+/* 数値から単位を除外
+───────────────────────────────── */
+@function strip-unit($number) {
+  @if (type-of($number) == 'number' and not unitless($number)) {
+    @return $number / ($number * 0 + 1);
+  }
+  @return $number;
+}
+
+/* `px` から `rem` に変換
+───────────────────────────────── */
+@function px2rem($number) {
+  $result: $number;
+  @if (not(unit($number) == 'px')) {
+    @return $result;
+  }
+  $result: strip-unit($number / $base-font-size) * 1rem;
+  @return $result;
+}
+
+/* `px` から `em` に変換
+───────────────────────────────── */
+@function px2em($number, $parent-number: $base-font-size) {
+  $result: $number;
+  @if (not(unit($number) == 'px')) {
+    @return $result;
+  }
+  $result: strip-unit($number / $parent-number) * 1em;
+  @return $result;
 }
