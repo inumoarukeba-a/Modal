@@ -46,13 +46,13 @@ const SHOW_MODAL = element => {
 }
 
 // Show Overlay
-const SHOW_OVERLAY = () => {
+const SHOW_OVERLAY = element => {
   // HTML
   scroll_top = WIN.pageYOffset
   $HTML.style.top = -scroll_top + 'px'
   $HTML.classList.add('-fixed')
   // Add Class
-  DOC.querySelector('.modal').classList.add('-opened')
+  _CLOSEST(element, 'modal').classList.add('-opened')
 }
 
 // Close Modal
@@ -60,23 +60,25 @@ const CLOSE_MODAL = () => {
   // Remove Class
   modal_active.classList.remove('-opened')
   $HTML.focus()
+  // Remove Active Element
+  modal_active = false
 }
 
 // Close Overlay
-const CLOSE_OVERLAY = () => {
-  // Remove Active Element
-  modal_active = false
+const CLOSE_OVERLAY = element => {
   // HTML
   $HTML.classList.remove('-fixed')
   $SCROLL_TAG.scrollTop = scroll_top
   // Remove Class
-  DOC.querySelector('.modal').classList.remove('-opened')
+  _CLOSEST(element, 'modal').classList.remove('-opened')
 }
 
 // Move Modal
 const MOVE_MODAL = direction => {
   // Variables
-  const $MODAL_ITEM = DOC.querySelectorAll('.modal__item')
+  const $MODAL_ITEM = _CLOSEST(modal_active, 'modal').querySelectorAll(
+    '.modal__item'
+  )
   const MODAL_ITEM_LENGTH = $MODAL_ITEM.length
   // Get Target
   modal_target = [].slice.call($MODAL_ITEM).indexOf(modal_active)
@@ -152,7 +154,7 @@ DOC.addEventListener(
       modal_target = DOC.querySelector(modal_target)
       // Call Functions
       SCROLL_LIMITEDLY(modal_target)
-      SHOW_OVERLAY()
+      SHOW_OVERLAY(modal_target)
       SHOW_MODAL(modal_target)
     }
 
@@ -180,14 +182,14 @@ DOC.addEventListener(
       _CLOSEST(THIS_TARGET, 'modal__closeInterface')
     ) {
       SCROLL_RESTART(modal_target)
+      CLOSE_OVERLAY(modal_active)
       CLOSE_MODAL()
-      CLOSE_OVERLAY()
     }
     if (_CLOSEST(THIS_TARGET, 'modal__inner')) return false
     // Call Functions
     SCROLL_RESTART(modal_target)
+    CLOSE_OVERLAY(modal_active)
     CLOSE_MODAL()
-    CLOSE_OVERLAY()
 
     return false
   },
@@ -205,8 +207,8 @@ WIN.addEventListener('keydown', () => {
   const keyCode = event.keyCode
   // Escape
   if (keyCode == 27) {
+    CLOSE_OVERLAY(modal_active)
     CLOSE_MODAL()
-    CLOSE_OVERLAY()
   }
   // <-
   if (keyCode == 37) {
